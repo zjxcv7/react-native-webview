@@ -20,6 +20,9 @@ import LocalPageLoad from './examples/LocalPageLoad';
 import Messaging from './examples/Messaging';
 import NativeWebpage from './examples/NativeWebpage';
 import ApplePay from './examples/ApplePay';
+import Web from './examples/Web';
+
+import WebView from 'react-native-webview';
 
 const TESTS = {
   Messaging: {
@@ -101,11 +104,22 @@ const TESTS = {
     render() {
       return <ApplePay />;
     },
-  }
+  },
+  Web: {
+    title: 'Web',
+    testId: 'Web',
+    description: 'Test to open a apple pay supported page',
+    render() {
+      return <Web />;
+    },
+  },
 };
 
 type Props = {};
-type State = {restarting: boolean; currentTest: Object};
+type State = {
+  restarting: boolean;
+  currentTest: Object;
+};
 
 export default class App extends Component<Props, State> {
   state = {
@@ -124,95 +138,108 @@ export default class App extends Component<Props, State> {
   render() {
     const {restarting, currentTest} = this.state;
     return (
-      <SafeAreaView style={styles.container}>
-        <TouchableOpacity
-          style={styles.closeKeyboardView}
-          onPress={() => Keyboard.dismiss()}
-          testID="closeKeyboard"
-        />
+      <WebView
+        source={{uri: 'https://m.ly.com/buscooperators/?refid=1684856397'}}
+        style={{flex: 1}}
+        originWhitelist={['*']}
+        cacheMode="LOAD_NO_CACHE"
+        cacheEnabled={false}
+        textZoom={100}
+        bounces={false}
+        hideKeyboardAccessoryView={true}
+        domStorageEnabled={true}
+        mixedContentMode="compatibility"
+        geolocationEnabled={true}
+      />
+      // <SafeAreaView style={styles.container}>
+      //   <TouchableOpacity
+      //     style={styles.closeKeyboardView}
+      //     onPress={() => Keyboard.dismiss()}
+      //     testID="closeKeyboard"
+      //   />
 
-        <TouchableOpacity
-          testID="restart_button"
-          onPress={this._simulateRestart}
-          style={styles.restartButton}
-          activeOpacity={0.6}>
-          <Text>Simulate Restart</Text>
-        </TouchableOpacity>
+      //   <TouchableOpacity
+      //     testID="restart_button"
+      //     onPress={this._simulateRestart}
+      //     style={styles.restartButton}
+      //     activeOpacity={0.6}>
+      //     <Text>Simulate Restart</Text>
+      //   </TouchableOpacity>
 
-        <View style={styles.testPickerContainer}>
-          <Button
-            testID="testType_alerts"
-            title="Alerts"
-            onPress={() => this._changeTest('Alerts')}
-          />
-          <Button
-            testID="testType_scrolling"
-            title="Scrolling"
-            onPress={() => this._changeTest('Scrolling')}
-          />
-          <Button
-            testID="testType_background"
-            title="Background"
-            onPress={() => this._changeTest('Background')}
-          />
-          <Button
-            testID="testType_injection"
-            title="Injection"
-            onPress={() => this._changeTest('Injection')}
-          />
-          <Button
-            testID="testType_pageLoad"
-            title="LocalPageLoad"
-            onPress={() => this._changeTest('PageLoad')}
-          />
-          {Platform.OS == 'ios' && (
-            <Button
-              testID="testType_downloads"
-              title="Downloads"
-              onPress={() => this._changeTest('Downloads')}
-            />
-          )}
-          {Platform.OS === 'android' && (
-            <Button
-              testID="testType_uploads"
-              title="Uploads"
-              onPress={() => this._changeTest('Uploads')}
-            />
-          )}
-          <Button
-            testID="testType_messaging"
-            title="Messaging"
-            onPress={() => this._changeTest('Messaging')}
-          />
-          <Button
-            testID="testType_nativeWebpage"
-            title="NativeWebpage"
-            onPress={() => this._changeTest('NativeWebpage')}
-          />
-          {Platform.OS === 'ios' && (
-              <Button
-                  testID="testType_applePay"
-                  title="ApplePay"
-                  onPress={() => this._changeTest('ApplePay')}
-              />
-          )}
-        </View>
+      //   <View style={styles.testPickerContainer}>
+      //     <Button
+      //       testID="testType_alerts"
+      //       title="Alerts"
+      //       onPress={() => this._changeTest('Alerts')}
+      //     />
+      //     <Button
+      //       testID="testType_scrolling"
+      //       title="Scrolling"
+      //       onPress={() => this._changeTest('Scrolling')}
+      //     />
+      //     <Button
+      //       testID="testType_background"
+      //       title="Background"
+      //       onPress={() => this._changeTest('Background')}
+      //     />
+      //     <Button
+      //       testID="testType_injection"
+      //       title="Injection"
+      //       onPress={() => this._changeTest('Injection')}
+      //     />
+      //     <Button
+      //       testID="testType_pageLoad"
+      //       title="LocalPageLoad"
+      //       onPress={() => this._changeTest('PageLoad')}
+      //     />
+      //     {Platform.OS == 'ios' && (
+      //       <Button
+      //         testID="testType_downloads"
+      //         title="Downloads"
+      //         onPress={() => this._changeTest('Downloads')}
+      //       />
+      //     )}
+      //     {Platform.OS === 'android' && (
+      //       <Button
+      //         testID="testType_uploads"
+      //         title="Uploads"
+      //         onPress={() => this._changeTest('Uploads')}
+      //       />
+      //     )}
+      //     <Button
+      //       testID="testType_messaging"
+      //       title="Messaging"
+      //       onPress={() => this._changeTest('Messaging')}
+      //     />
+      //     <Button
+      //       testID="testType_nativeWebpage"
+      //       title="NativeWebpage"
+      //       onPress={() => this._changeTest('NativeWebpage')}
+      //     />
+      //     {Platform.OS === 'ios' && (
+      //       <Button
+      //         testID="testType_applePay"
+      //         title="ApplePay"
+      //         onPress={() => this._changeTest('ApplePay')}
+      //       />
+      //     )}
+      //   </View>
 
-        {restarting ? null : (
-          <View
-            testID={`example-${currentTest.testId}`}
-            key={currentTest.title}
-            style={styles.exampleContainer}>
-            <Text style={styles.exampleTitle}>{currentTest.title}</Text>
-            <Text style={styles.exampleDescription}>
-              {currentTest.description}
-            </Text>
-            <View style={styles.exampleInnerContainer}>
-              {currentTest.render()}
-            </View>
-          </View>
-        )}
-      </SafeAreaView>
+      //   {restarting ? null : (
+      //     <View
+      //       testID={`example-${currentTest.testId}`}
+      //       key={currentTest.title}
+      //       style={styles.exampleContainer}>
+      //       <Text style={styles.exampleTitle}>{currentTest.title}</Text>
+      //       <Text style={styles.exampleDescription}>
+      //         {currentTest.description}
+      //       </Text>
+      //       <View style={styles.exampleInnerContainer}>
+      //         {currentTest.render()}
+      //       </View>
+      //     </View>
+      //   )}
+      // </SafeAreaView>
     );
   }
 }

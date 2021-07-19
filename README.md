@@ -9,6 +9,8 @@
 
 **React Native WebView** is a modern, well-supported, and cross-platform WebView for React Native. It is intended to be a replacement for the built-in WebView (which will be [removed from core](https://github.com/react-native-community/discussions-and-proposals/pull/3)).
 
+**添加支付宝和微信 H5 支付支持**
+
 ## Core Maintainers - Sponsoring companies
 
 _This project is maintained for free by these people using both their free time and their company work time._

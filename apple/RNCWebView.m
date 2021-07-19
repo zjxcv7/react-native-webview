@@ -9,6 +9,7 @@
 #import <React/RCTConvert.h>
 #import <React/RCTAutoInsetsProtocol.h>
 #import "RNCWKProcessPoolManager.h"
+#import "CZBInfoManager.h"
 #if !TARGET_OS_OSX
 #import <UIKit/UIKit.h>
 #else
@@ -993,9 +994,34 @@ static NSDictionary* customCertificatesForHost;
       _onLoadingStart(event);
     }
   }
-
-  // Allow all navigation by default
-  decisionHandler(WKNavigationActionPolicyAllow);
+    
+    NSString *url = navigationAction.request.URL.absoluteString;
+    if ([url hasPrefix:@"https://wx.tenpay.com/cgi-bin/mmpayweb-bin/checkmweb"]){
+        decisionHandler(WKNavigationActionPolicyCancel);
+        
+        if ([url containsString:@"redirect_url="]) {
+            NSArray *arr = [url componentsSeparatedByString:@"redirect_url="];
+            url = [arr firstObject];
+            _endPayRedirectURL = [arr lastObject];
+            url = [url stringByAppendingFormat:@"redirect_url=smant://"];
+        } else {
+            url = [url stringByAppendingFormat:@"redirect_url=smant://"];
+        }
+        NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:url] cachePolicy:(NSURLRequestUseProtocolCachePolicy) timeoutInterval:30];
+        request.allHTTPHeaderFields = navigationAction.request.allHTTPHeaderFields;
+        [webView loadRequest:request];
+        return ;
+    }
+    
+    ///解决微信支付返回后白屏问题
+    if ([navigationAction.request.URL.scheme containsString:@"smant://"] && [webView canGoBack]) {
+        [webView goBack];
+    }
+    
+    ////////////////************************* 处理请求
+    BOOL isAllow = [CZBInfoManager webView:webView decidePolicyForNavigationAction:navigationAction];
+    // Allow all navigation by default
+    decisionHandler( isAllow ? WKNavigationActionPolicyAllow:WKNavigationActionPolicyCancel);
 }
 
 /**

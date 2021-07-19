@@ -5,6 +5,7 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.DownloadManager;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -40,6 +41,7 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
@@ -81,6 +83,7 @@ import com.reactnativecommunity.webview.events.TopLoadingStartEvent;
 import com.reactnativecommunity.webview.events.TopMessageEvent;
 import com.reactnativecommunity.webview.events.TopShouldStartLoadWithRequestEvent;
 import com.reactnativecommunity.webview.events.TopRenderProcessGoneEvent;
+import com.reactnativecommunity.webview.pay.PayUtil;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -876,9 +879,23 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
           return false;
         }
 
+        // 微信统一下单
+
+        // 微信或者支付宝支付
+        if(PayUtil.urlIsWexinPay(url) || PayUtil.urlIsAlipayPay(url)){
+          try {
+            Intent intent = new Intent();
+            intent.setAction(Intent.ACTION_VIEW);
+            intent.setData(Uri.parse(url));
+             ((ReactContext) view.getContext()).getCurrentActivity().startActivity(intent);
+          } catch (Exception e) {
+            Toast.makeText(((ReactContext) view.getContext()).getCurrentActivity(), "未安装相应的客户端", Toast.LENGTH_LONG).show();
+          }
+          return true;
+        }
+
         final boolean shouldOverride = lockObject.get() == ShouldOverrideCallbackState.SHOULD_OVERRIDE;
         RNCWebViewModule.shouldOverrideUrlLoadingLock.removeLock(lockIdentifier);
-
         return shouldOverride;
       } else {
         FLog.w(TAG, "Couldn't use blocking synchronous call for onShouldStartLoadWithRequest due to debugging or missing Catalyst instance, falling back to old event-and-load.");
